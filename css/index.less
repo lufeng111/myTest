@@ -71,13 +71,12 @@ body {
     position: relative;
     overflow: hidden;
     /*轮播图片*/ 
-    ul {
-        width: 1000%;
-        transform: translateX(-10%);
-        -webkit-transform: translateX(-10%);
+    ul {       
         li {
-            float: left;
-            width: 10%;
+            position: absolute;
+            left: 0;
+            top: 0;      
+            transform: translateX(220%);     
             a {
                 display: block;
                 img {
@@ -85,6 +84,16 @@ body {
                     display: block;
                 }
             }
+        }
+
+        li:first-child {
+            transform: translateX(0);
+        }
+        li:last-child {
+            transform: translateX(-100%);
+        }
+        li:nth-child(2) {
+            transform: translateX(100%);
         }
     }
     /*小圆点*/

@@ -1,174 +1,145 @@
+window.onload = function () {
+   //1-由于li标签定位脱标， 必须实施获取图片的高度，赋值给 ul
+    setHeight();
+    //2-监听窗口变化， 实时设置
+    window.addEventListener('resize', function () {
+        setHeight();
+    })
 
-(function () {
-    //要实现功能： 
-    //1-倒计时效果
-    downTime();
-    //2-头部滚动变色
-    setHeader();
-    //3-京东快报无缝效果
-    news();
-    //4-触屏轮播图实现 
+    //3-轮播图的功能
     banner();
 
+    //设置ul的高
+   function setHeight() {
+      document.querySelector('.jd-banner ul').style.height 
+        = document.querySelector('.jd-banner ul img').offsetHeight + 'px';
+   }
 
-    //1- 倒计时功能    
-    //倒计时时间 - 当前时间  = 时间的差值  t
-    //实现思路：使用定时器 递减 时间t， 将递减之后 时分秒 显示到标签上 
-    function downTime() {
-        var  t = 5 * 60 * 60;  //5小时   1小时30分钟4秒  3600 + 1800 + 4   5405 
-        var spans = document.querySelectorAll('.jd-seckill .time span:nth-child(odd)');
-        console.log(spans);        
+   //轮播图
+   function banner () {
+     //获取元素
+     var  banner = document.querySelector('.jd-banner');
+     var  lis = banner.querySelectorAll('ul li');
+     var width = banner.offsetWidth; //获取banenr的宽 
 
-        var timer = setInterval(function () {
-            //将t（秒数）转成时分秒
-            var  h = Math.floor(t / 3600);
-            var  m = Math.floor(t % 3600 / 60); //不足1小时部分算分钟
-            var  s = t % 60;                    //不足一分钟算秒
+     var  index = 0; //当前轮播图片
+     var  prev = 7;  //上一张
+     var  next = 1;  //下一张
 
-            //将时间转成00:00:00格式
-
-            h = h < 10 ? '0' + h : h;
-            m = m < 10 ? '0' + m : m;
-            s = s < 10 ? '0' + s : s;
-
-            // console.log(h);
-            // console.log(m);
-            // console.log(s);
-            //显示到span中
-            spans[0].innerHTML = h;
-            spans[1].innerHTML = m;
-            spans[2].innerHTML = s;
-            
-            t--;
-            //判断是否越界
-            if(t < 0) {
-                t = 5 * 60 * 60;
-            }            
-        }, 1000);      
-
-    }
-
-    //2-头部滚动变色
-    //随着页面滚动，头部盒子不透明度越来越大，
-    //比值 = 页面滚出去高度 / banner的高度 
-    function setHeader() {
-        var banner = document.querySelector('.jd-banner');
-        var header = document.querySelector('.jd-header'); 
-        //监听页面滚动时间
-        window.addEventListener('scroll', function () {
-            //获取页面卷曲的高度           
-            var top = window.pageYOffset;
-            var height = banner.offsetHeight; //获取banner高
-            // console.log(top);
-            // console.log(height);
-
-            //计算比值
-            var value = top / height;
-
-            if(value > 1) {
-                value = 1;
+     function setData() {
+            //判断index是否越界 
+            if(index > 7) {
+                index = 0; 
             }
-
-            //将value值设置为 header的 透明度 rgb(222, 24, 27)
-            header.style.backgroundColor = 'rgba(222, 24, 27, ' + value +')';
-
-            
-        })
-    }
-
-    //3-京东快报
-    //新闻 每2秒切换一次，无缝切换效果 
-    //处理对webkit内核的兼容 ： 使用驼峰命名来兼容webkit内核  针对css3的属性
-    function news () {
-        //1-先获取需要的元素
-        var ul = document.querySelector('.jd-news ul');
-        var lis = ul.querySelectorAll('li');
-
-        //2-让ul做动画
-        //动画本质： 让一个变量的值发生改变，将这个改变值赋值盒子某个属性，动画就产生了
-        var  index = 0; 
-        setInterval(function () {
-            index++;
-            //添加过渡
-            ul.style.transition = 'transform .3s'; 
-            ul.style.webkitTransition = 'transform .3s'; 
-            //根据index值做动画
-            ul.style.transform = 'translateY('+ (-index * 30) +'px)';
-            ul.style.webkitTransform = 'translateY('+ (-index * 30) +'px)';
-        }, 2000);
-
-        //在每次动画做完间隙，判断index值是否达到临界值，如果到5，立即调回0进行重合 
-        ul.addEventListener('transitionend', function () {
-            //判断index是否最一个，若是index 设置为0， ul 瞬移到 第一个li进行重合，实现无缝滚动
-            if (index >= lis.length - 1 ) {
-                index = 0; //index复位
-                //移除过渡
-                ul.style.transition = 'none';
-                ul.style.webkitTransition = 'none';
-                //ul位置复位
-                ul.style.transform = 'translateY(0)';
-                ul.style.webkitTransform = 'translateY(0)';
+   
+            if(index < 0) {
+                index = 7;
             }
-        })
-    }
-
-
-    //4-轮播图
-    //1-定时器切换轮播图
-    //2-触屏切换轮播
-
-    function banner () {
-        var banner = document.querySelector('.jd-banner');
-        var ul = banner.querySelector('ul');
-        var width = banner.offsetWidth; //获取banner宽度
-        var points = banner.querySelectorAll('ol li');
-        var  index = 1; //当前显示的第二张图片（第一张是替补）
-
-        console.log(points);
-        
-
-        //1-定时器切换轮播图
-        var timer = setInterval(function () {
-            index++; //累加index
-            //轮播图根据index值做动画
-            //轮播图移动距离 = -index * 一屏的宽度 
-            //添加过渡
-            // 注意 过渡持续时间一定要小于 定时器间隔时间 ，否则transitionend事件 不会触发
-            ul.style.transition = 'transform 0.3s';
-            ul.style.transform = 'translateX('+(-index * width)+'px)';
-        }, 1000);
-
-        //2-在ul动画完成间隙 判断 index值是否越界
-        ul.addEventListener('transitionend', function () {
-            if (index >=9 ) {
-                index = 1;  //index 复位
-                //去掉过渡
-                ul.style.transition = 'none';
-                //ul瞬移到真正的第一张图片,进行重合实现无缝
-                ul.style.transform = 'translateX('+ (-index * width) +'px)';
+   
+            //在index安全情况，计算 prev next
+            prev = index -1;
+            next = index + 1;
+   
+            //判断prev 和 next是否越界
+            if (prev < 0) {
+                prev = 7;
             }
-
-            if (index <= 0) {
-                index = 8;
-                //去掉过渡
-                ul.style.transition = 'none';
-                //ul瞬移到真正的第一张图片,进行重合实现无缝
-                ul.style.transform = 'translateX('+ (-index * width) +'px)';
+   
+            if (next > 7) {
+                next = 0;
             }
+     }
 
-            //此时index经过了重重判断， 到此 index一定是合理；
-            setPoints(index -1);
-        })
+     //1定时器切换轮播图
+     var  timer = setInterval(function () {
+        //  lis[prev].style.transform = 'translate('+(-100 + index * 10)+'px, '+(200 + index * 10)+'%)';
 
-        //3-切换小圆点方式
-        function setPoints(index) {
-            //1-排他
-            points.forEach(function (v, i) {
-                //$('li').removeClass('current');
-                v.classList.remove('current');
-            })
-            //2-突出显示自己
-            points[index].classList.add('current');
+
+         index++; //累加index 
+         setData(); //判断index是否越界，根据index值推算 prev next 
+         //添加动画
+         //向左滑动的情况下，下一张next 不需要过渡效果
+         lis[index].style.transition = 'transform 0.3s';
+         lis[prev].style.transition = 'transform 0.3s';
+         lis[next].style.transition = 'none';
+
+         
+         //此时 index  prev  next 数据安全，可以用于做动画
+         //根据index值，选对应图片放到 ，上一张，下一张，当前的位置
+         lis[index].style.transform = 'translateX(0)';
+         lis[prev].style.transform = 'translateX(' + -width + 'px)';
+         lis[next].style.transform = 'translateX('+ width +'px)';
+
+     }, 1000)
+
+
+     //2-触屏滑动轮播图
+     //触屏开始
+     // 1-清空定时器
+     // 2-获取触屏坐标值
+     //触屏移动
+     // 1-获取移动坐标值
+     // 2-计算出距离差
+     // 3- index  next  prev 一起跟随手指移动
+     //触屏结束
+     // 判断滑动距离是否大于 width/ 3 
+     // 判断是否切换  判断上一张 下一张  改变index的值
+     // 根据index值做动画
+
+     var startX = 0;
+     var moveX = 0;
+     var distanceX = 0;
+
+     banner.addEventListener('touchstart', function (e) {
+        // 1-清空定时器
+        clearInterval(timer);
+        // 2-获取触屏坐标值
+        startX = e.targetTouches[0].clientX;
+     });
+
+     banner.addEventListener('touchmove', function (e) {
+            // 1-获取移动坐标值
+             moveX = e.targetTouches[0].clientX;
+            // 2-计算出距离差
+            distanceX = moveX - startX;
+            // 3- index  next  prev 一起跟随手指移动
+            //移除过渡 
+            lis[index].style.transition = 'none';
+            lis[prev].style.transition = 'none';
+            lis[next].style.transition = 'none';
+            //跟随手指移动的距离 = 之前位置 + distanceX;
+            //prev index  next 一起移动 30 + 100
+            lis[index].style.transform = 'translateX('+ distanceX +'px)';
+            lis[prev].style.transform = 'translateX('+ (-width + distanceX) +'px)';
+            lis[next].style.transform = 'translateX('+ (width + distanceX) +'px)';
+    });
+
+    banner.addEventListener('touchend', function (e) {
+        var direction = '';
+        //判断是否要切换图片
+        if (Math.abs(distanceX) > width / 3) {
+            //切换图片 上一张？ 还是下一张？
+            if (distanceX > 0) {
+                index--;
+                direction = 'right';
+            }
+            if(distanceX < 0) {
+                index++;
+                direction = 'left';
+            }
+            setData(); //判断index是否越界，根据index值推算 prev next 
         }
-    }
-})();
+        //添加动画
+         //向左滑动的情况下，下一张next 不需要过渡效果
+         //向右滑动的情况下，上一张prev 不需要过渡效果
+         lis[index].style.transition = 'transform 0.3s';
+         lis[prev].style.transition = direction == 'right'? 'none' : 'transform 0.3s';
+         lis[next].style.transition = direction == 'left'? 'none' : 'transform 0.3s';
+
+        //根据index值 做动画 
+        lis[index].style.transform = 'translateX(0)';
+        lis[prev].style.transform = 'translateX(' + -width + 'px)';
+        lis[next].style.transform = 'translateX('+ width +'px)';
+    });
+   }
+};

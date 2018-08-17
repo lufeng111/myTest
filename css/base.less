@@ -57,3 +57,40 @@ input {
     background-image: url(../images/jd-sprites.png);          
     background-size: 200px 200px; /*压缩背景图片*/
 }
+
+/*公共头部*/
+.header {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 44px;
+    // background-color: #daa520; /*金麒麟*/
+    background-image: linear-gradient(#eee, #bbb);
+    .back,
+    .menu {
+        width: 44px;
+        height: 44px;
+        float: left;
+        background-position:  -22px 0;
+        padding: 12px;
+        //设置盒子背景从content-box开始平铺
+        background-origin: content-box;
+        //设置将content-box之外的背景裁剪调
+        background-clip: content-box;
+    }
+
+    .menu {
+        float: right;
+        background-position:  -60px 0;
+
+    }
+
+    .search {
+        height: 44px;
+        // background-color: coral;
+        overflow: hidden;
+        padding-top: 7px;       
+    }
+
+}  
